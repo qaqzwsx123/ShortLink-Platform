@@ -26,13 +26,15 @@
               <el-tooltip
                 class="box-item"
                 effect="dark"
-                :content="item.shortLinkCount === 0 ? '无数据' : '查看图表'"
+                :content="'查看图表'"
                 placement="bottom-end"
               >
+                <!-- 传group是为了表示这个请求是查询分组图表数据 -->
                 <el-icon
+                  v-if="!(item.shortLinkCount === 0 || item.shortLinkCount === null)"
                   class="edit"
                   :class="{ zero: item.shortLinkCount === 0 }"
-                  @click="chartsVisible(item.name)"
+                  @click="chartsVisible({ describe: item.name, gid: item.gid, group: true })"
                 >
                   <Histogram />
                 </el-icon>
@@ -53,7 +55,7 @@
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-              <span class="item-length">{{ item.shortLinkCount }}</span>
+              <span class="item-length">{{ item.shortLinkCount ?? 0 }}</span>
             </div>
           </div>
         </li>
@@ -108,17 +110,18 @@
               暂无链接
             </div>
           </template>
+          <el-table-column type="selection" width="35" />
           <el-table-column label="短链接信息" prop="info" min-width="300">
             <template #header>
-              <span>短链接信息</span>
               <el-dropdown>
                 <div class="block" style="margin-top: 3px">
+                  <span>短链接信息</span>
                   <el-icon>
                     <CaretBottom />
                   </el-icon>
                 </div>
                 <template #dropdown>
-                  <el-dropdown-item>创建时间</el-dropdown-item>
+                  <el-dropdown-item @click="pageParams.orderTag = null">创建时间</el-dropdown-item>
                 </template>
               </el-dropdown>
             </template>
@@ -196,16 +199,20 @@
           </el-table-column>
           <el-table-column label="访问次数" prop="times" width="120">
             <template #header>
-              <span>访问次数</span>
               <el-dropdown>
                 <div class="block" style="margin-top: 3px">
+                  <span>访问次数</span>
                   <el-icon>
                     <CaretBottom />
                   </el-icon>
                 </div>
                 <template #dropdown>
-                  <el-dropdown-item>今日访问次数</el-dropdown-item>
-                  <el-dropdown-item>累计访问次数</el-dropdown-item>
+                  <el-dropdown-item @click="pageParams.orderTag = 'todayPv'"
+                    >今日访问次数</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="pageParams.orderTag = 'totalPv'"
+                    >累计访问次数</el-dropdown-item
+                  >
                 </template>
               </el-dropdown>
             </template>
@@ -213,27 +220,31 @@
               <div class="times-box">
                 <div class="today-box">
                   <span>今日</span>
-                  <span>2</span>
+                  <span>{{ scope.row.todayPv }}</span>
                 </div>
                 <div class="total-box">
                   <span>累计</span>
-                  <span>1</span>
+                  <span>{{ scope.row.totalPv }}</span>
                 </div>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="访问人数" prop="people" width="120">
             <template #header>
-              <span>访问人数</span>
               <el-dropdown>
                 <div class="block" style="margin-top: 3px">
+                  <span>访问人数</span>
                   <el-icon>
                     <CaretBottom />
                   </el-icon>
                 </div>
                 <template #dropdown>
-                  <el-dropdown-item>今日访问人数</el-dropdown-item>
-                  <el-dropdown-item>累计访问人数</el-dropdown-item>
+                  <el-dropdown-item @click="pageParams.orderTag = 'todayUv'"
+                    >今日访问人数</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="pageParams.orderTag = 'totalUv'"
+                    >累计访问人数</el-dropdown-item
+                  >
                 </template>
               </el-dropdown>
             </template>
@@ -241,27 +252,31 @@
               <div class="times-box">
                 <div class="today-box">
                   <span>今日</span>
-                  <span>2</span>
+                  <span>{{ scope.row.todayUv }}</span>
                 </div>
                 <div class="total-box">
                   <span>累计</span>
-                  <span>1</span>
+                  <span>{{ scope.row.totalUv }}</span>
                 </div>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="IP数" prop="IP" width="120">
             <template #header>
-              <span>IP数</span>
               <el-dropdown>
                 <div class="block" style="margin-top: 3px">
+                  <span>IP数</span>
                   <el-icon>
                     <CaretBottom />
                   </el-icon>
                 </div>
                 <template #dropdown>
-                  <el-dropdown-item>今日IP数</el-dropdown-item>
-                  <el-dropdown-item>累计IP数</el-dropdown-item>
+                  <el-dropdown-item @click="pageParams.orderTag = 'todayUip'"
+                    >今日IP数</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="pageParams.orderTag = 'totalUip'"
+                    >累计IP数</el-dropdown-item
+                  >
                 </template>
               </el-dropdown>
             </template>
@@ -269,11 +284,11 @@
               <div class="times-box">
                 <div class="today-box">
                   <span>今日</span>
-                  <span>2</span>
+                  <span>{{ scope.row.todayUip }}</span>
                 </div>
                 <div class="total-box">
                   <span>累计</span>
-                  <span>1</span>
+                  <span>{{ scope.row.totalUip }}</span>
                 </div>
               </div>
             </template>
@@ -370,7 +385,13 @@
       ref="chartsInfoRef"
       :title="chartsInfoTitle"
       :info="chartsInfo"
+      :tableInfo="tableInfo"
+      :isGroup="isGroup"
+      :nums="nums"
+      :favicon="favicon1"
+      :originUrl="originUrl1"
       @changeTime="changeTime"
+      @changePage="changePage"
       top="60px"
     ></ChartsInfo>
     <!-- 新建分组弹框 -->
@@ -464,17 +485,23 @@ import Sortable from 'sortablejs'
 import { cloneDeep } from 'lodash'
 import ChartsInfo from './components/chartsInfo/ChartsInfo.vue'
 import CreateLink from './components/createLink/CreateLink.vue'
-import { getNowFormatDate, getNextWeekFormatDate } from '@/utils/plugins.js'
+import { getTodayFormatDate, getLastWeekFormatDate } from '@/utils/plugins.js'
 import EditLink from './components/editLink/EditLink.vue'
 import { ElMessage } from 'element-plus'
 import defaultImg from '@/assets/png/短链默认图标.png'
 import QRCode from './components/qrCode/QRCode.vue'
+
+// 查看图表的时候传过去展示的，没什么用
+const nums = ref(0)
+const favicon1 = ref()
+const originUrl1 = ref()
 
 const { proxy } = getCurrentInstance()
 const API = proxy.$API
 const chartsInfoRef = ref()
 const chartsInfoTitle = ref()
 const chartsInfo = ref()
+const tableInfo = ref()
 const createLink1Ref = ref()
 const createLink2Ref = ref()
 let selectedIndex = ref(0)
@@ -495,21 +522,33 @@ const afterAddLink = () => {
   }
 }
 const statsFormData = reactive({
-  startDate: getNowFormatDate(),
-  endDate: getNextWeekFormatDate()
+  endDate: getTodayFormatDate(),
+  startDate: getLastWeekFormatDate(),
+  size: 10,
+  current: 1
 })
 const initStatsFormData = () => {
-  statsFormData.startDate = getNowFormatDate()
-  statsFormData.endDate = getNextWeekFormatDate()
+  statsFormData.endDate = getTodayFormatDate()
+  statsFormData.startDate = getLastWeekFormatDate()
 }
 const visitLink = {
   fullShortUrl: '',
   gid: ''
 }
+// 打开的图表是分组（true为分组）的还是单链的
+const isGroup = ref(false)
+const tableFullShortUrl = ref()
+const tableGid = ref()
 // 点击查看数据图表
 const chartsVisible = async (rowInfo, dateList) => {
   chartsInfoTitle.value = rowInfo?.describe
-  const { fullShortUrl, gid } = rowInfo
+  // 如果传入的group为true的话就查询分组的数据，如果没传就查询单链的数据
+  const { fullShortUrl, gid, group, originUrl, favicon } = rowInfo
+  originUrl1.value = originUrl
+  favicon1.value = favicon
+  isGroup.value = group
+  tableFullShortUrl.value = fullShortUrl
+  tableGid.value = gid
   // 后续修改时间的时候拿去用
   visitLink.fullShortUrl = fullShortUrl
   visitLink.gid = gid
@@ -519,16 +558,71 @@ const chartsVisible = async (rowInfo, dateList) => {
     initStatsFormData()
   } else {
     // 否则就按照传过来的数据去请求数据
-    statsFormData.startDate = dateList?.[0]
-    statsFormData.endDate = dateList?.[1]
+    statsFormData.startDate = dateList?.[0] + ' 00:00:00'
+    statsFormData.endDate = dateList?.[1] + ' 23:59:59'
   }
-  const res = await API.smallLinkPage.queryLinkStats({ ...statsFormData, fullShortUrl, gid })
+  let res = null
+  let tableRes = null
+  if (group) {
+    res = await API.group.queryGroupStats({ ...statsFormData, fullShortUrl, gid })
+    tableRes = await API.group.queryGroupTable({ gid, ...statsFormData })
+  } else {
+    res = await API.smallLinkPage.queryLinkStats({ ...statsFormData, fullShortUrl, gid })
+    tableRes = await API.smallLinkPage.queryLinkTable({ gid, fullShortUrl, ...statsFormData })
+  }
+  tableInfo.value = tableRes
   chartsInfo.value = res?.data?.data
   console.log(res?.data?.data)
   // debugger
 }
+// 图表修改时间后重新请求数
+const changeTimeData = async (rowInfo, dateList) => {
+  const { fullShortUrl, gid } = rowInfo
+  visitLink.fullShortUrl = fullShortUrl
+  visitLink.gid = gid
+  if (!dateList) {
+    initStatsFormData()
+  } else {
+    // 否则就按照传过来的数据去请求数据
+    statsFormData.startDate = dateList?.[0] + ' 00:00:00'
+    statsFormData.endDate = dateList?.[1] + ' 23:59:59'
+  }
+  let res = null
+  let tableRes = null
+  // 判断是分组还是单个短链接
+  if (isGroup.value) {
+    res = await API.group.queryGroupStats({ ...statsFormData, fullShortUrl, gid })
+    tableRes = await API.group.queryGroupTable({ gid, ...statsFormData })
+  } else {
+    res = await API.smallLinkPage.queryLinkStats({ ...statsFormData, fullShortUrl, gid })
+    tableRes = await API.smallLinkPage.queryLinkTable({ gid, fullShortUrl, ...statsFormData })
+  }
+  tableInfo.value = tableRes
+  chartsInfo.value = res?.data?.data
+  console.log(res?.data?.data)
+}
+// 修改时间
 const changeTime = (dateList) => {
-  chartsVisible(visitLink, dateList)
+  console.log('修改了时间')
+  changeTimeData(visitLink, dateList)
+}
+// 修改页码信息
+const changePage = async (page) => {
+  const { current, size } = page
+  statsFormData.current = current ?? 1
+  statsFormData.size = size ?? 10
+  let tableRes = null
+  // 判断是分组还是单个短链接
+  if (isGroup.value) {
+    tableRes = await API.group.queryGroupTable({ gid: tableGid.value, ...statsFormData })
+  } else {
+    tableRes = await API.smallLinkPage.queryLinkTable({
+      gid: tableGid.value,
+      fullShortUrl: tableFullShortUrl.value,
+      ...statsFormData
+    })
+  }
+  tableInfo.value = tableRes
 }
 // 将原来的数据转化为拖拽后传给后端的数据格式
 const transformGroupData = (oldIndex, newIndex) => {
@@ -598,12 +692,21 @@ const tableData = ref([])
 const pageParams = reactive({
   gid: null,
   current: 1,
-  size: 15
+  size: 15,
+  orderTag: null
 })
+watch(
+  () => pageParams.orderTag,
+  (nV) => {
+    console.log(nV)
+    queryPage()
+  }
+)
 const totalNums = ref(0)
 const queryPage = async () => {
   pageParams.gid = editableTabs.value?.[selectedIndex.value]?.gid
-  // console.log('------', editableTabs.value, selectedIndex.value)
+  nums.value = editableTabs.value?.[selectedIndex.value]?.shortLinkCount || 0
+  console.log('------', editableTabs.value, selectedIndex.value)
   const res = await API.smallLinkPage.queryPage(pageParams)
   tableData.value = res.data?.data?.records
   totalNums.value = +res.data?.data?.total
@@ -781,6 +884,7 @@ const recoverLink = (data) => {
     .then((res) => {
       ElMessage.success('恢复成功')
       queryRecycleBinPage()
+      getGroupInfo(queryPage)
     })
     .catch((reason) => {
       ElMessage.error('恢复失败')
@@ -917,6 +1021,7 @@ const removeLink = (data) => {
 }
 
 .block:hover {
+  color: rgb(121, 187, 255);
   .el-icon {
     color: rgb(121, 187, 255) !important;
   }
