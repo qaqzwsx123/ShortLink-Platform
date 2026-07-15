@@ -84,7 +84,7 @@ const formData = reactive({
   domain: defaultDomain,
   originUrl: editData.originUrl,
   gid: editData.gid,
-  originalGid: editData.gid,
+  originGid: editData.gid,
   createdType: editData.createdType,
   validDate: editData.validDate,
   describe: editData.describe,
@@ -167,6 +167,9 @@ watch(
     formData.describe = nV.describe
     formData.validDateType = nV.validDateType
     formData.fullShortUrl = nV.fullShortUrl
+  },
+  {
+    immediate: true
   }
 )
 // 校验规则
