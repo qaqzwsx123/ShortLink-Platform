@@ -766,9 +766,12 @@ const queryPage = async () => {
   nums.value = editableTabs.value?.[selectedIndex.value]?.shortLinkCount || 0
   console.log('------', editableTabs.value, selectedIndex.value)
   const res = await API.smallLinkPage.queryPage(pageParams)
-  tableData.value = res.data?.data?.records
-  totalNums.value = +res.data?.data?.total
-  // console.log('获取到的页面数据', res)
+  if (res?.data.success) {
+    tableData.value = res.data?.data?.records
+    totalNums.value = +res.data?.data?.total
+  } else {
+    ElMessage.error(res?.data.message)
+  }
 }
 
 const handleSizeChange = () => {
@@ -836,7 +839,7 @@ const addGroup = async () => {
     ElMessage.success('添加成功')
     getGroupInfo(queryPage)
   } else {
-    ElMessage.error('添加失败')
+    ElMessage.error(res1?.data.message)
   }
   isAddGroup.value = false
   addGroupLoading.value = false
