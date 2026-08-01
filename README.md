@@ -40,6 +40,14 @@ URL。短链接通常只包含几个字符，而原始的长 URL 可能会非常
 - 什么是 SaaS 短链接系统：[https://nageoffer.com/shortlink](https://nageoffer.com/shortlink)
 - 🔥SaaS 短链接视频教程：[https://nageoffer.com/shortlink/video](https://nageoffer.com/shortlink/video)
 
+---
+
+在线体验地址：[SaaS短链接演示环境](http://shortlink.magestack.cn)
+
+受限于网络安全规则，短链接跳转的目标网址仅支持 [拿个offer](https://nageoffer.com)、[知乎](https://zhihu.com)、[掘金](https://juejin.cn)、[博客园](https://cnblogs.com) 域名下所属链接。
+
+---
+
 ## 大话面试
 
 屏幕前的你是否遇到过网上面经杂乱，不知道如何筛选？八股文内容太多太杂，无法总结有效回答 Battle 面试官？
