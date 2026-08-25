@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: 8005
 spring:
   application:
     name: short-link-gateway
@@ -10,8 +10,13 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-      password: CHANGE_ME
   cloud:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    sentinel:
+      transport:
+        port: 8720
+        dashboard: 127.0.0.1:8090
+        client-ip: 127.0.0.1
+      eager: true

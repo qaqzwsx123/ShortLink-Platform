@@ -11,7 +11,6 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-      password: CHANGE_ME
   mvc:
     view:
       prefix: /templates/
@@ -20,6 +19,15 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+        ip: 127.0.0.1
+        metadata:
+          preserved.register.timeout: 5000
+    sentinel:
+      transport:
+        port: 8719 #每个微服务的poet端口必须不一样
+        dashboard: 127.0.0.1:8090
+        client-ip: 127.0.0.1  # ✅强制sentinel transport服务绑定127.0.0.1，不要绑定错误网卡
+      eager: true
 
 short-link:
   domain:

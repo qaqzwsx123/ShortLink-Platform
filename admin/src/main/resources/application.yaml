@@ -11,11 +11,24 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-      password: CHANGE_ME
   cloud:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+        ip: 127.0.0.1
+          # 延长注册超时时间，默认3000ms容易超时
+        metadata:
+            preserved.register.timeout: 5000
+    sentinel:
+      transport:
+        port: 9000  #项目与sentinel控制台交互的端口
+        dashboard: 127.0.0.1:8090 #sentinel控制台的ip与端口
+        # ✅强制sentinel transport服务绑定127.0.0.1，不要绑定错误网卡
+        client-ip: 127.0.0.1
+      # ✅【重点】开启饥饿加载，启动就连接dashboard，不用等访问接口
+      eager: true
+
+
 
 short-link:
   group:

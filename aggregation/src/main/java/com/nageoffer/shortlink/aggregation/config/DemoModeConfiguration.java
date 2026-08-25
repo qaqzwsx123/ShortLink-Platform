@@ -18,8 +18,8 @@
 package com.nageoffer.shortlink.aggregation.config;
 
 import com.alibaba.fastjson.JSON;
-import com.nageoffer.shortlink.admin.common.convention.result.Result;
-import com.nageoffer.shortlink.admin.common.convention.result.Results;
+import com.nageoffer.shortlink.project.common.convention.result.Result;
+import com.nageoffer.shortlink.project.common.convention.result.Results;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

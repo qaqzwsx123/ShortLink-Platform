@@ -14,7 +14,7 @@
 
     <developers>
         <developer>
-            <name>马丁</name>
+            <name>gym</name>
             <email>machen@apache.org</email>
             <url>https://github.com/magestacks</url>
             <organization>Apache and openGoofy</organization>
@@ -23,9 +23,13 @@
 
     <properties>
         <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <spring-boot.version>3.0.7</spring-boot.version>
         <spring-cloud.version>2022.0.3</spring-cloud.version>
-        <spring-cloud-alibaba.version>2022.0.0.0-RC2</spring-cloud-alibaba.version>
+      <!--  <spring-cloud-alibaba.version>2022.0.0.0-RC2</spring-cloud-alibaba.version> -->
+        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
         <mybatis-spring-boot-starter.version>3.0.2</mybatis-spring-boot-starter.version>
         <shardingsphere.version>5.3.2</shardingsphere.version>
         <jjwt.version>0.9.1</jjwt.version>
@@ -139,6 +143,7 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
@@ -148,12 +153,8 @@
                 <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <java>
-                        <!--<eclipse>
-                            <file>${maven.multiModuleProjectDirectory}/format/short-link_spotless_formatter.xml</file>
-                        </eclipse>-->
                         <licenseHeader>
-                            <!-- ${maven.multiModuleProjectDirectory} 爆红属于正常，并不影响编译或者运行，忽略就好 -->
-                            <file>${maven.multiModuleProjectDirectory}/format/license-header</file>
+                            <file>${project.parent.basedir}/format/license-header</file>
                         </licenseHeader>
                     </java>
                 </configuration>

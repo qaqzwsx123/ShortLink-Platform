@@ -114,4 +114,13 @@ public class ShortLinkController {
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam) {
         return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
+    @GetMapping("/api/short-link/hi")
+    @SentinelResource(
+            value = "say_hello",
+            blockHandler = "sayHelloBlockHandlerMethod",
+            blockHandlerClass = CustomBlockHandler.class
+    )
+    public String sayHello() {
+        return "niHao sentinel";
+    }
 }

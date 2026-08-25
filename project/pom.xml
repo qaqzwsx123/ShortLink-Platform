@@ -78,9 +78,18 @@
             <artifactId>sentinel-annotation-aspectj</artifactId>
         </dependency>
 
+
+        <!-- 底层http通信包，负责上报心跳给dashboard！很多版本starter不会自动引入！ -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-transport-simple-http</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+
+
     </dependencies>
 </project>

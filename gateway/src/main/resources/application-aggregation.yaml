@@ -2,20 +2,67 @@ spring:
   cloud:
     gateway:
       routes:
+        # =============================================
+        # 路由1：Admin 服务路由
+        # =============================================
         - id: short-link-admin-aggregation
-          uri: lb://short-link-aggregation/api/short-link/admin/**
-          predicates:
-            - Path=/api/short-link/admin/**
-          filters:
-            - name: TokenValidate
-              args:
-                whitePathList:
-                  - /api/short-link/admin/v1/user/login
-                  - /api/short-link/admin/v1/user/has-username
+          # 路由ID，唯一标识，自定义名称
 
-        - id: short-link-project-aggregation
-          uri: lb://short-link-aggregation/api/short-link/**
+          # 目标URI：使用 LoadBalancer 负载均衡到 short-link-aggregation 服务
+          # lb:// 表示使用 Spring Cloud LoadBalancer 进行客户端负载均衡
+          # short-link-aggregation 是服务名（在 Nacos 中注册的名称）
+          # /api/short-link/admin/** 是路径前缀（会保留原始请求的完整路径）
+          uri: lb://short-link-aggregation/api/short-link/admin/**
+          #     ↑                    ↑
+          #  负载均衡协议         服务名 + 路径前缀
+
+          # 断言（Predicate）：匹配请求的条件
           predicates:
-            - Path=/api/short-link/**
+            # Path 断言：匹配路径以 /api/short-link/admin/ 开头的请求
+            # /** 表示匹配任意子路径
+            # 例如：/api/short-link/admin/v1/user/login ✅
+            #      /api/short-link/admin/v1/user/has-username ✅
+            #      /api/short-link/project/v1/xxx ❌（不匹配）
+            - Path=/api/short-link/admin/**
+
+          # 过滤器（Filter）：对请求进行处理
           filters:
+            # TokenValidate 是自定义过滤器，用于验证 Token（JWT）
             - name: TokenValidate
+              # 过滤器参数
+              args:
+                # 白名单路径列表：这些路径不需要验证 Token
+                whitePathList:
+                  # 登录接口：不需要 Token
+                  - /api/short-link/admin/v1/user/login
+                  # 检查用户名是否存在接口：不需要 Token
+                  - /api/short-link/admin/v1/user/has-username
+                  # 可以继续添加其他不需要 Token 的路径
+                  # - /api/short-link/admin/v1/user/register  # 注册接口
+
+        # =============================================
+        # 路由2：Project 服务路由
+        # =============================================
+        - id: short-link-project-aggregation
+          # 路由ID，唯一标识
+
+          # 目标URI：负载均衡到 short-link-aggregation 服务
+          # /api/short-link/** 是路径前缀
+          uri: lb://short-link-aggregation/api/short-link/**
+          #     ↑                    ↑
+          #  负载均衡到聚合服务   路径前缀
+
+          # 断言：匹配路径以 /api/short-link/ 开头的请求
+          predicates:
+            # Path 断言：匹配 /api/short-link/** 路径
+            # 注意：这个路由会匹配 /api/short-link/project/** 等路径
+            # 但不会匹配 /api/short-link/admin/**（因为更具体的路由优先）
+            - Path=/api/short-link/**
+
+          # 过滤器：Token 验证
+          filters:
+            # 使用相同的 TokenValidate 过滤器
+            # 注意：这个路由没有配置白名单，所有请求都需要 Token
+            - name: TokenValidate
+              # 没有配置 whitePathList，表示所有请求都需要验证 Token
+              # 这样 /api/short-link/project/v1/create 等接口都需要登录才能访问

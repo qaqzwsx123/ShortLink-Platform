@@ -17,6 +17,7 @@
 
 package com.nageoffer.shortlink.admin.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.common.convention.result.Results;
@@ -86,5 +87,10 @@ public class ShortLinkController {
     @GetMapping("/api/short-link/admin/v1/page")
     public Result<Page<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return shortLinkActualRemoteService.pageShortLink(requestParam.getGid(), requestParam.getOrderTag(), requestParam.getCurrent(), requestParam.getSize());
+    }
+    @GetMapping("/api/short-link/admin/hi")
+    @SentinelResource(value = "sayHello")
+    public String sayHello() {
+        return "niHao sentinel";
     }
 }
