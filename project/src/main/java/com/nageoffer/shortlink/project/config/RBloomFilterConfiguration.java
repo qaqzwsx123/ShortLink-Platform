@@ -34,7 +34,10 @@ public class RBloomFilterConfiguration {
      */
     @Bean
     public RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter(RedissonClient redissonClient) {
+        // 跳转前快速判断短链接是否可能存在，拦截无效请求，减少数据库空查。
         RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("shortUriCreateCachePenetrationBloomFilter");
+        // 布隆过滤器允许“误判存在”，但不能“误判不存在”；误判后仍由数据库查询兜底。
+        //预估要存入的短链接总量: 1亿，误判率0.1%，计算出需要的bit数组长度和hash函数个数。
         cachePenetrationBloomFilter.tryInit(100000000L, 0.001);
         return cachePenetrationBloomFilter;
     }
