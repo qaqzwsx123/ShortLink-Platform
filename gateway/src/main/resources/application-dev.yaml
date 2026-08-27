@@ -2,20 +2,46 @@ spring:
   cloud:
     gateway:
       routes:
+        # ==================== 路由1：短链接管理后台服务 ====================
         - id: short-link-admin
+          # 路由唯一标识，用于日志和监控中区分不同路由
+
+          # uri: 转发目标地址
+          # lb:// 表示使用 Nacos 服务发现 + 客户端负载均衡（Ribbon/LoadBalancer）
+          # 后面跟着的是 Nacos 中注册的服务名，以及可选的路径前缀
+          # 注意：这里的 /api/short-link/admin/** 实际上是作为“匹配后重写”的前缀，
+          # 但 Gateway 默认不会自动截断，需要配合 RewritePath 等过滤器，此处写法有误（见下文说明）
           uri: lb://short-link-admin/api/short-link/admin/**
+
+          # predicates: 断言（匹配条件）
+          # 当请求路径匹配 /api/short-link/admin/** 时，进入此路由
           predicates:
             - Path=/api/short-link/admin/**
+
+          # filters: 过滤器链
+          # 对匹配到的请求施加额外的处理逻辑
           filters:
             - name: TokenValidate
+              # 名为 TokenValidate 的自定义全局过滤器（需在代码中实现）
               args:
+                # 白名单路径列表：这些路径会跳过 Token 校验
                 whitePathList:
-                  - /api/short-link/admin/v1/user/login
-                  - /api/short-link/admin/v1/user/has-username
+                  - /api/short-link/admin/v1/user/login      # 登录接口放行
+                  - /api/short-link/admin/v1/user/has-username # 检查用户名是否存在接口放行
 
+        # ==================== 路由2：短链接核心业务服务 ====================
         - id: short-link-project
+          # 路由唯一标识
+
+          # uri: 同样使用 Nacos 服务名 lb://short-link-project，
+          # 注意这里没有多余路径，路径由 predicates 中的 Path 完全控制
           uri: lb://short-link-project/api/short-link/**
+
+          # predicates: 匹配所有 /api/short-link/** 的请求（注意优先级，它比上面的更宽泛）
           predicates:
             - Path=/api/short-link/**
+
+          # filters: 同样应用 TokenValidate 过滤器，但此处没有配置白名单，
+          # 意味着该路由下所有请求都需要校验 Token
           filters:
             - name: TokenValidate

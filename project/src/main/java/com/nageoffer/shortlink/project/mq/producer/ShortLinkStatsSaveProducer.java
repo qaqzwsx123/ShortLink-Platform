@@ -40,6 +40,7 @@ public class ShortLinkStatsSaveProducer {
      * 发送延迟消费短链接统计
      */
     public void send(Map<String, String> producerMap) {
+        // 写入 Redis Stream，避免跳转请求同步写多张统计表。
         stringRedisTemplate.opsForStream().add(SHORT_LINK_STATS_STREAM_TOPIC_KEY, producerMap);
     }
 }

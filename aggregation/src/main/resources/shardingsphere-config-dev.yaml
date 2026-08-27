@@ -1,43 +1,64 @@
-dataSources:
-  ds_0:
-    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver
+# ============================================================
+# ShardingSphere-JDBC 数据分片 + 字段加密配置文件
+# 适用场景：短链接服务，需要对用户、分组、链接等核心表进行水平拆分，
+#          同时对用户敏感信息（手机号、邮箱）进行 AES 加密存储。
+# ============================================================
+
+dataSources:  # 数据源配置（此处仅配置了一个物理库 ds_0）
+  ds_0:       # 数据源名称，逻辑库对应实际 MySQL 实例
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource  # 使用 HikariCP 连接池
+    driverClassName: com.mysql.cj.jdbc.Driver                 # MySQL 8.0 驱动
     jdbcUrl: jdbc:mysql://127.0.0.1:3306/link?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # 连接 URL 说明：
+    #   - rewriteBatchedStatements=true  ：开启批量更新优化，提升插入性能
+    #   - allowMultiQueries=true         ：允许一次执行多条 SQL（慎用，防止注入）
+    #   - serverTimezone=Asia/Shanghai   ：指定时区
+    #   - allowPublicKeyRetrieval=true   ：允许客户端获取公钥（MySQL 8.0 认证需要）
     username: root
     password: CHANGE_ME
 
-rules:
+rules:  # 规则列表（ShardingSphere 支持多种规则，这里包含分片和加密）
+  # ---------- 1. 分片规则 ----------
   - !SHARDING
-    tables:
+    tables:   # 需要分片的逻辑表及其对应物理表映射
+      # 用户表：按 username 字段哈希取模，拆分为 16 张物理表 t_user_0 ~ t_user_15
       t_user:
-        actualDataNodes: ds_0.t_user_${0..15}
-        tableStrategy:
-          standard:
-            shardingColumn: username
-            shardingAlgorithmName: user_table_hash_mod
+        actualDataNodes: ds_0.t_user_${0..15}    # 物理表分布：ds_0 库下的 16 张表
+        tableStrategy:                           # 分表策略
+          standard:                              # 标准分片策略（单分片键）
+            shardingColumn: username             # 分片键（用于计算表序号）
+            shardingAlgorithmName: user_table_hash_mod  # 引用下方定义的分片算法
+
+      # 分组表：同样按 username 分片，保证同一用户的分组数据落在同一张表，便于查询
       t_group:
         actualDataNodes: ds_0.t_group_${0..15}
         tableStrategy:
           standard:
             shardingColumn: username
             shardingAlgorithmName: group_table_hash_mod
+
+      # 短链接表：按 gid（分组 ID）分片，因为查询时大多携带 gid
       t_link:
         actualDataNodes: ds_0.t_link_${0..15}
         tableStrategy:
           standard:
             shardingColumn: gid
             shardingAlgorithmName: link_table_hash_mod
+
+      # 短链接跳转映射表（用于快速定位长链接）：按 full_short_url 分片
       t_link_goto:
         actualDataNodes: ds_0.t_link_goto_${0..15}
         tableStrategy:
           standard:
             shardingColumn: full_short_url
             shardingAlgorithmName: link_goto_table_hash_mod
+
+    # 分片算法定义（所有算法均为哈希取模）
     shardingAlgorithms:
       user_table_hash_mod:
-        type: HASH_MOD
+        type: HASH_MOD          # 内置取模算法
         props:
-          sharding-count: 16
+          sharding-count: 16    # 取模基数（16 张表）
       group_table_hash_mod:
         type: HASH_MOD
         props:
@@ -50,21 +71,24 @@ rules:
         type: HASH_MOD
         props:
           sharding-count: 16
+
+  # ---------- 2. 加密规则 ----------
   - !ENCRYPT
     tables:
-      t_user:
+      t_user:                     # 对 t_user 表的指定列进行加密
         columns:
-          phone:
-            cipherColumn: phone
-            encryptorName: common_encryptor
-          mail:
+          phone:                  # 手机号列
+            cipherColumn: phone   # 密文列（与明文列同名，表示原地加密覆盖）
+            encryptorName: common_encryptor   # 引用下方定义的加密器
+          mail:                   # 邮箱列
             cipherColumn: mail
             encryptorName: common_encryptor
-        queryWithCipherColumn: true
+        queryWithCipherColumn: true  # 查询时默认返回密文（但 ShardingSphere 会自动解密，对应用透明）
     encryptors:
       common_encryptor:
-        type: AES
+        type: AES                 # 使用 AES 对称加密
         props:
-          aes-key-value: d6oadClrrb9A3GWo
-props:
-  sql-show: true
+          aes-key-value: d6oadClrrb9A3GWo   # 16 字节密钥（实际生产应更复杂并妥善保管）
+
+props:                     # 额外配置属性
+  sql-show: true          # 打印最终执行的 SQL（含实际表名），便于调试

@@ -44,6 +44,7 @@ public class MessageQueueIdempotentHandler {
      */
     public boolean isMessageBeingConsumed(String messageId) {
         String key = IDEMPOTENT_KEY_PREFIX + messageId;
+        // setIfAbsent 具备原子性：只有第一个消费者能写入处理中标记，避免重复落库。
         return Boolean.FALSE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, "0", 2, TimeUnit.MINUTES));
     }
 
@@ -65,6 +66,7 @@ public class MessageQueueIdempotentHandler {
      */
     public void setAccomplish(String messageId) {
         String key = IDEMPOTENT_KEY_PREFIX + messageId;
+        // 处理成功标记保留一段时间，重复投递时可直接跳过。
         stringRedisTemplate.opsForValue().set(key, "1", 2, TimeUnit.MINUTES);
     }
 
@@ -75,6 +77,7 @@ public class MessageQueueIdempotentHandler {
      */
     public void delMessageProcessed(String messageId) {
         String key = IDEMPOTENT_KEY_PREFIX + messageId;
+        // 处理异常时删除标记，使后续重投消息可以重新执行。
         stringRedisTemplate.delete(key);
     }
 }

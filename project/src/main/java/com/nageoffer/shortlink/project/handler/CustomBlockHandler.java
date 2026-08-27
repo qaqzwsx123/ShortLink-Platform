@@ -25,6 +25,7 @@ import com.nageoffer.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 public class CustomBlockHandler {
 
     public static Result<ShortLinkCreateRespDTO> createShortLinkBlockHandlerMethod(ShortLinkCreateReqDTO requestParam, BlockException exception) {
+        // 触发 Sentinel 流控时快速失败，不再进入短链接生成和数据库写入流程。
         return new Result<ShortLinkCreateRespDTO>().setCode("B100000").setMessage("Too many requests, please try again later.");
     }
 

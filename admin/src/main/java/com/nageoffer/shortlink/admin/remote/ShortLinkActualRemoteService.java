@@ -42,7 +42,6 @@ import java.util.List;
 
 /**
  * 短链接中台远程调用服务
- * 公众号：马丁玩编程，回复：加群，添加马哥微信（备注：link）获取项目资料
  */
 @FeignClient(
         value = "short-link-project",
@@ -50,6 +49,8 @@ import java.util.List;
         configuration = OpenFeignConfiguration.class
 )
 public interface ShortLinkActualRemoteService {
+
+    // 管理模块通过服务名调用 project 模块，实例由 Nacos/LoadBalancer 解析。
 
     /**
      * 创建短链接
