@@ -39,6 +39,8 @@ import org.springframework.scripting.support.ResourceScriptSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.nageoffer.shortlink.admin.common.convention.errorcode.BaseErrorCode.FLOW_LIMIT_ERROR;
 
@@ -54,6 +56,7 @@ public class UserFlowRiskControlFilter implements Filter {
     private final UserFlowRiskControlConfiguration userFlowRiskControlConfiguration;
 
     private static final String USER_FLOW_RISK_CONTROL_LUA_SCRIPT_PATH = "lua/user_flow_risk_control.lua";
+    private final ConcurrentHashMap<String, LocalWindow> localWindows = new ConcurrentHashMap<>();
 
     @SneakyThrows
     @Override
@@ -67,7 +70,12 @@ public class UserFlowRiskControlFilter implements Filter {
             result = stringRedisTemplate.execute(redisScript, Lists.newArrayList(username), userFlowRiskControlConfiguration.getTimeWindow());
         } catch (Throwable ex) {
             log.error("执行用户请求流量限制LUA脚本出错", ex);
-            returnJson((HttpServletResponse) response, JSON.toJSONString(Results.failure(new ClientException(FLOW_LIMIT_ERROR))));
+            // Redis 限流不可用时切换到单实例本地限流，默认不放开流量。
+            if (!tryAcquireLocal(username)) {
+                returnJson((HttpServletResponse) response, JSON.toJSONString(Results.failure(new ClientException(FLOW_LIMIT_ERROR))));
+                return;
+            }
+            filterChain.doFilter(request, response);
             return;
         }
         if (result == null || result > userFlowRiskControlConfiguration.getMaxAccessCount()) {
@@ -75,6 +83,32 @@ public class UserFlowRiskControlFilter implements Filter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean tryAcquireLocal(String username) {
+        long now = System.currentTimeMillis();
+        long windowMillis = Long.parseLong(userFlowRiskControlConfiguration.getTimeWindow()) * 1000L;
+        LocalWindow window = localWindows.computeIfAbsent(username, key -> new LocalWindow(now));
+        synchronized (window) {
+            if (now - window.startMillis >= windowMillis) {
+                window.startMillis = now;
+                window.count.set(0L);
+            }
+            boolean allowed = window.count.incrementAndGet() <= userFlowRiskControlConfiguration.getMaxAccessCount();
+            if (now - window.startMillis >= windowMillis * 2L) {
+                localWindows.remove(username, window);
+            }
+            return allowed;
+        }
+    }
+
+    private static final class LocalWindow {
+        private long startMillis;
+        private final AtomicLong count = new AtomicLong();
+
+        private LocalWindow(long startMillis) {
+            this.startMillis = startMillis;
+        }
     }
 
     private void returnJson(HttpServletResponse response, String json) throws Exception {
