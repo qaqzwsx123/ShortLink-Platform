@@ -18,6 +18,7 @@
 package com.nageoffer.shortlink.project.mq.producer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import static com.nageoffer.shortlink.project.common.constant.RedisKeyConstant.S
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ShortLinkStatsSaveProducer {
 
     private final StringRedisTemplate stringRedisTemplate;
@@ -41,6 +43,11 @@ public class ShortLinkStatsSaveProducer {
      */
     public void send(Map<String, String> producerMap) {
         // 写入 Redis Stream，避免跳转请求同步写多张统计表。
-        stringRedisTemplate.opsForStream().add(SHORT_LINK_STATS_STREAM_TOPIC_KEY, producerMap);
+        try {
+            stringRedisTemplate.opsForStream().add(SHORT_LINK_STATS_STREAM_TOPIC_KEY, producerMap);
+        } catch (Exception ex) {
+            // 统计是非核心链路，Redis 故障时不阻断短链接跳转。
+            log.warn("Redis Stream 写入失败，丢弃本次统计事件", ex);
+        }
     }
 }
