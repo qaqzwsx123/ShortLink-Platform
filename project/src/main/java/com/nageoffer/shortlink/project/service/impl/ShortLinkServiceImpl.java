@@ -83,6 +83,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -109,6 +110,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
     private final GotoDomainWhiteListConfiguration gotoDomainWhiteListConfiguration;
+
+    /** Redis 故障时限制数据库兜底并发，避免缓存雪崩拖垮数据库。 */
+    private final Semaphore redisFallbackSemaphore = new Semaphore(100);
 
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
@@ -433,10 +437,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         // ============ 第一步：Cache Aside 模式 – 先查 Redis 映射缓存 ============
         // 目的：绝大多数合法短链接的跳转请求都应直接命中缓存，避免数据库压力。
-        String originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
+        String originalLink;
+        try {
+            originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
+        } catch (Exception ex) {
+            log.warn("Redis 缓存读取失败，降级查询数据库，fullShortUrl={}", fullShortUrl, ex);
+            restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+            return;
+        }
         if (StrUtil.isNotBlank(originalLink)) {
             // 命中：记录统计事件（异步），并发送 302 重定向
-            shortLinkStats(buildLinkStatsRecordAndSetUser(fullShortUrl, request, response));
+            safeShortLinkStats(fullShortUrl, request, response);
             ((HttpServletResponse) response).sendRedirect(originalLink);
             return;
         }
@@ -445,7 +456,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // 目的：缓存未命中时，通过布隆过滤器判断该短链接是否可能存在于数据库。
         // 若过滤器明确表示“不存在”，则直接返回 404，避免对数据库的无效查询（防穿透）。
         // 注：布隆过滤器存在假阳性（可能误判存在），但绝不会漏判（不存在则一定不存在）。
-        boolean contains = shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
+        boolean contains;
+        try {
+            contains = shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
+        } catch (Exception ex) {
+            log.warn("Redis BloomFilter 不可用，降级查询数据库，fullShortUrl={}", fullShortUrl, ex);
+            restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+            return;
+        }
         if (!contains) {
             ((HttpServletResponse) response).sendRedirect("/page/notfound");
             return;
@@ -454,8 +472,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // ============ 第三步：检查“空值缓存” ============
         // 目的：如果之前查库发现该链接不存在（可能因布隆过滤器假阳性导致），
         // 我们会缓存一个空值标记（-），有效期内直接返回 404，避免反复查库。
-        String gotoIsNullShortLink = stringRedisTemplate.opsForValue()
-                .get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+        String gotoIsNullShortLink;
+        try {
+            gotoIsNullShortLink = stringRedisTemplate.opsForValue()
+                    .get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+        } catch (Exception ex) {
+            log.warn("Redis 空值缓存读取失败，降级查询数据库，fullShortUrl={}", fullShortUrl, ex);
+            restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+            return;
+        }
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
             ((HttpServletResponse) response).sendRedirect("/page/notfound");
             return;
@@ -466,19 +491,38 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // 此处按 fullShortUrl 粒度加 Redisson 分布式锁，保证只有一个线程回源查库，
         // 其他线程等待锁释放后再次检查缓存（双重检查）。
         RLock lock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
-        lock.lock();
+        boolean locked;
+        try {
+            // 只设置等待时间，不传 leaseTime，继续使用 Redisson 看门狗自动续期。
+            locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
+        } catch (Exception ex) {
+            log.warn("Redis 分布式锁不可用，降级查询数据库，fullShortUrl={}", fullShortUrl, ex);
+            restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+            return;
+        }
+        if (!locked) {
+            log.warn("获取短链接回源锁超时，降级查询数据库，fullShortUrl={}", fullShortUrl);
+            restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+            return;
+        }
         try {
             // ---------- 双重检查：再次查询缓存（可能已被其他线程填充） ----------
-            originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
+            try {
+                originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
+                gotoIsNullShortLink = stringRedisTemplate.opsForValue()
+                        .get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+            } catch (Exception ex) {
+                log.warn("回源过程 Redis 二次检查失败，降级查询数据库，fullShortUrl={}", fullShortUrl, ex);
+                restoreUrlByDatabaseFallback(fullShortUrl, request, response);
+                return;
+            }
             if (StrUtil.isNotBlank(originalLink)) {
                 // 其他线程已回源成功，直接使用缓存结果
-                shortLinkStats(buildLinkStatsRecordAndSetUser(fullShortUrl, request, response));
+                safeShortLinkStats(fullShortUrl, request, response);
                 ((HttpServletResponse) response).sendRedirect(originalLink);
                 return;
             }
             // 再次检查空值缓存（可能其他线程已缓存“不存在”）
-            gotoIsNullShortLink = stringRedisTemplate.opsForValue()
-                    .get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
             if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
                 ((HttpServletResponse) response).sendRedirect("/page/notfound");
                 return;
@@ -494,11 +538,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // 路由表无记录 → 该短链接确实不存在（布隆过滤器假阳性触发）
             if (shortLinkGotoDO == null) {
                 // 缓存空值 30 分钟，防止短时间内大量相同请求穿透到数据库
-                stringRedisTemplate.opsForValue().set(
-                        String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
-                        "-",
-                        30,
-                        TimeUnit.MINUTES);
+                cacheNullValue(fullShortUrl);
                 ((HttpServletResponse) response).sendRedirect("/page/notfound");
                 return;
             }
@@ -515,32 +555,88 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             if (shortLinkDO == null
                     || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 // 同样缓存空值标记，避免过期链接被频繁访问
-                stringRedisTemplate.opsForValue().set(
-                        String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
-                        "-",
-                        30,
-                        TimeUnit.MINUTES);
+                cacheNullValue(fullShortUrl);
                 ((HttpServletResponse) response).sendRedirect("/page/notfound");
                 return;
             }
 
             // ---------- 回填缓存 ----------
             // 将原始长链接存入 Redis，并设置恰当的过期时间（根据链接有效期动态计算）
-            stringRedisTemplate.opsForValue().set(
-                    String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
-                    shortLinkDO.getOriginUrl(),
-                    LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()),
-                    TimeUnit.MILLISECONDS);
+            try {
+                stringRedisTemplate.opsForValue().set(
+                        String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
+                        shortLinkDO.getOriginUrl(),
+                        LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()),
+                        TimeUnit.MILLISECONDS);
+            } catch (Exception ex) {
+                log.warn("Redis 缓存回填失败，继续返回数据库结果，fullShortUrl={}", fullShortUrl, ex);
+            }
 
             // 记录统计事件（异步写入 Redis Stream，最终落库）
-            shortLinkStats(buildLinkStatsRecordAndSetUser(fullShortUrl, request, response));
+            safeShortLinkStats(fullShortUrl, request, response);
 
             // 执行 302 重定向到原始长链接
             ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
 
         } finally {
             // 无论成功或异常，确保释放分布式锁，避免死锁
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private void cacheNullValue(String fullShortUrl) {
+        try {
+            stringRedisTemplate.opsForValue().set(
+                    String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
+                    "-",
+                    30,
+                    TimeUnit.MINUTES);
+        } catch (Exception ex) {
+            log.warn("Redis 空值缓存写入失败，fullShortUrl={}", fullShortUrl, ex);
+        }
+    }
+
+    /** Redis 故障期间的受控数据库兜底，不回填 Redis，避免继续放大故障。 */
+    @SneakyThrows
+    private void restoreUrlByDatabaseFallback(String fullShortUrl, ServletRequest request, ServletResponse response) {
+        if (!redisFallbackSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return;
+        }
+        try {
+            ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(
+                    Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                            .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl));
+            if (shortLinkGotoDO == null) {
+                ((HttpServletResponse) response).sendRedirect("/page/notfound");
+                return;
+            }
+            ShortLinkDO shortLinkDO = baseMapper.selectOne(
+                    Wrappers.lambdaQuery(ShortLinkDO.class)
+                            .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
+                            .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
+                            .eq(ShortLinkDO::getDelFlag, 0)
+                            .eq(ShortLinkDO::getEnableStatus, 0));
+            if (shortLinkDO == null
+                    || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
+                ((HttpServletResponse) response).sendRedirect("/page/notfound");
+                return;
+            }
+            safeShortLinkStats(fullShortUrl, request, response);
+            ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
+        } finally {
+            redisFallbackSemaphore.release();
+        }
+    }
+
+    /** 统计属于非核心链路，Redis/Stream 异常不能阻断短链接跳转。 */
+    private void safeShortLinkStats(String fullShortUrl, ServletRequest request, ServletResponse response) {
+        try {
+            shortLinkStats(buildLinkStatsRecordAndSetUser(fullShortUrl, request, response));
+        } catch (Exception ex) {
+            log.warn("短链接统计降级丢弃，fullShortUrl={}", fullShortUrl, ex);
         }
     }
 
