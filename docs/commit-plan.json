@@ -1,0 +1,597 @@
+[
+  {
+    "batch": 1,
+    "date": "2026-06-01T10:00:00+08:00",
+    "subject": "chore: 初始化多模块工程与公共依赖",
+    "author": "qaqzwsx123",
+    "commit": "3be8f1fcd0366b48cfeac60f04acda78c4560210"
+  },
+  {
+    "batch": 2,
+    "date": "2026-06-02T12:13:00+08:00",
+    "subject": "feat: 初始化短链接中心与网关模块",
+    "author": "qaqzwsx123",
+    "commit": "a578a25f25f4eb0b7467fab616a8c1ed005b55c8"
+  },
+  {
+    "batch": 3,
+    "date": "2026-06-03T14:26:00+08:00",
+    "subject": "feat: 建立统一响应规约与全局异常处理",
+    "author": "qaqzwsx123",
+    "commit": "1a90050d5b2e91ff7d79c6b842d53590a7a89776"
+  },
+  {
+    "batch": 4,
+    "date": "2026-06-04T16:39:00+08:00",
+    "subject": "feat: 开发用户查询与敏感信息脱敏",
+    "author": "qaqzwsx123",
+    "commit": "17db498e7c0c31fc20a04fc68fdc0f5a8ca01de0"
+  },
+  {
+    "batch": 5,
+    "date": "2026-06-05T10:52:00+08:00",
+    "subject": "feat: 开发用户注册接口",
+    "author": "qaqzwsx123",
+    "commit": "38322cb27f3dfe8c083673eb2d4f25ea215c9b5d"
+  },
+  {
+    "batch": 6,
+    "date": "2026-06-06T12:05:00+08:00",
+    "subject": "feat: 完善实体属性填充与注册分布式锁",
+    "author": "qaqzwsx123",
+    "commit": "58bf777d4301b9b9dbd9b64309ea6ee053ad638a"
+  },
+  {
+    "batch": 7,
+    "date": "2026-06-07T14:18:00+08:00",
+    "subject": "feat: 配置用户分表与敏感字段加密",
+    "author": "qaqzwsx123",
+    "commit": "a792a90c7cc30eb0cad43e475a4eb3704ceaf2af"
+  },
+  {
+    "batch": 8,
+    "date": "2026-06-08T16:31:00+08:00",
+    "subject": "feat: 完成用户修改、登录与退出接口",
+    "author": "qaqzwsx123",
+    "commit": "8e098e7c2028b83863174b45dba6793888640a05"
+  },
+  {
+    "batch": 9,
+    "date": "2026-06-10T10:44:00+08:00",
+    "subject": "feat: 开发用户分组新增与列表查询",
+    "author": "qaqzwsx123",
+    "commit": "ce3345e1afe72f29dcd5e686ca3f91ec2b70b7ce"
+  },
+  {
+    "batch": 10,
+    "date": "2026-06-11T12:57:00+08:00",
+    "subject": "feat: 封装登录用户上下文与接口拦截",
+    "author": "qaqzwsx123",
+    "commit": "fd49216f273f63eb854c1b88c665a01bfa49bccf"
+  },
+  {
+    "batch": 11,
+    "date": "2026-06-12T14:10:00+08:00",
+    "subject": "feat: 完成分组修改、删除与排序",
+    "author": "qaqzwsx123",
+    "commit": "a353f50c43d751799e4943b7df798e3bedf260fc"
+  },
+  {
+    "batch": 12,
+    "date": "2026-06-13T16:23:00+08:00",
+    "subject": "refactor: 统一管理接口路径与鉴权错误提示",
+    "author": "qaqzwsx123",
+    "commit": "229f767fb68abf239f8e35ab4d438facf50fbf67"
+  },
+  {
+    "batch": 13,
+    "date": "2026-06-14T10:36:00+08:00",
+    "subject": "chore: 配置服务打包与短链接基础组件",
+    "author": "qaqzwsx123",
+    "commit": "aa4aec4430f73cedb87940e065408cd0627a519a"
+  },
+  {
+    "batch": 14,
+    "date": "2026-06-15T12:49:00+08:00",
+    "subject": "feat: 开发短链接生成与创建接口",
+    "author": "qaqzwsx123",
+    "commit": "98032d5263b1b866d628b2066c53358309813b9b"
+  },
+  {
+    "batch": 15,
+    "date": "2026-06-16T14:02:00+08:00",
+    "subject": "feat: 实现短链接分表与分页查询",
+    "author": "qaqzwsx123",
+    "commit": "2e231e1ebd6d03f8d930ccd8941127678c28ff58"
+  },
+  {
+    "batch": 16,
+    "date": "2026-06-17T16:15:00+08:00",
+    "subject": "fix: 修正Token过滤路径并完善分页时间字段",
+    "author": "qaqzwsx123",
+    "commit": "124a9eba2f13cf2f142baba248dc8320b8c29404"
+  },
+  {
+    "batch": 17,
+    "date": "2026-06-18T10:28:00+08:00",
+    "subject": "feat: 接入管理端远程调用与分组分表",
+    "author": "qaqzwsx123",
+    "commit": "e7072349d9e75a6d4dcfe6b21121dfc2bc7d529b"
+  },
+  {
+    "batch": 18,
+    "date": "2026-06-19T12:41:00+08:00",
+    "subject": "fix: 完善默认分组创建与用户上下文传递",
+    "author": "qaqzwsx123",
+    "commit": "14563e2c40236d5d354872d57412d4198cd3d794"
+  },
+  {
+    "batch": 19,
+    "date": "2026-06-20T14:54:00+08:00",
+    "subject": "feat: 完成短链接修改与有效期参数处理",
+    "author": "qaqzwsx123",
+    "commit": "53b4daac2b31f8e474a607010d00be0752160f97"
+  },
+  {
+    "batch": 20,
+    "date": "2026-06-21T16:07:00+08:00",
+    "subject": "feat: 实现短链接访问重定向",
+    "author": "qaqzwsx123",
+    "commit": "25ba2a2bac40d652676025067ee07624fc20c789"
+  },
+  {
+    "batch": 21,
+    "date": "2026-06-22T10:20:00+08:00",
+    "subject": "refactor: 统一链接协议展示与生产分表规则",
+    "author": "qaqzwsx123",
+    "commit": "1920eba0461dfb6c469b5f6c152f069753f38cf1"
+  },
+  {
+    "batch": 22,
+    "date": "2026-06-23T12:33:00+08:00",
+    "subject": "perf: 增加分布式锁与布隆过滤器防护",
+    "author": "qaqzwsx123",
+    "commit": "e2514b74cca7df7f820493fa06c70bceb173eac6"
+  },
+  {
+    "batch": 23,
+    "date": "2026-06-25T14:46:00+08:00",
+    "subject": "feat: 实现缓存预热与过期链接处理",
+    "author": "qaqzwsx123",
+    "commit": "9b6600f32206b52e037ec7dd394e9898a49eb4d9"
+  },
+  {
+    "batch": 24,
+    "date": "2026-06-26T16:59:00+08:00",
+    "subject": "feat: 增加失效提示页与目标网站标题获取",
+    "author": "qaqzwsx123",
+    "commit": "0ae8e34c62dbea04f5654e1db83f6fb537fcff9e"
+  },
+  {
+    "batch": 25,
+    "date": "2026-06-27T10:12:00+08:00",
+    "subject": "feat: 开发回收站保存与分页查询",
+    "author": "qaqzwsx123",
+    "commit": "802fdbdee2024e8d97c10c8a7acfcea64ae836d6"
+  },
+  {
+    "batch": 26,
+    "date": "2026-06-28T12:25:00+08:00",
+    "subject": "feat: 完成回收站恢复、移除及网站图标获取",
+    "author": "qaqzwsx123",
+    "commit": "f63650a9688dd69f3007a9f04037eeac636c7c78"
+  },
+  {
+    "batch": 27,
+    "date": "2026-06-29T14:38:00+08:00",
+    "subject": "feat: 实现短链接PV、UV与UIP访问统计",
+    "author": "qaqzwsx123",
+    "commit": "b6f1e94718063081bcb53a8cacfe4e40471f0d60"
+  },
+  {
+    "batch": 28,
+    "date": "2026-06-30T16:51:00+08:00",
+    "subject": "feat: 增加访问地区与操作系统统计",
+    "author": "qaqzwsx123",
+    "commit": "75910d1feee632459e4a115cb644c5a9378e6475"
+  },
+  {
+    "batch": 29,
+    "date": "2026-07-01T10:04:00+08:00",
+    "subject": "chore: 补充工程规范、Maven脚本与项目说明",
+    "author": "qaqzwsx123",
+    "commit": "1c222e908ec09cfa0a38bf9242ea2beedc7bd91c"
+  },
+  {
+    "batch": 30,
+    "date": "2026-07-02T12:17:00+08:00",
+    "subject": "feat: 开发浏览器与高频访问IP统计",
+    "author": "qaqzwsx123",
+    "commit": "ae25eceb62ff5f6ef99d2c9783132e3c1fdff1da"
+  },
+  {
+    "batch": 31,
+    "date": "2026-07-03T14:30:00+08:00",
+    "subject": "feat: 开发访问设备与网络类型统计",
+    "author": "qaqzwsx123",
+    "commit": "a407038d69ac81e2a748c32bda0266868146a3f0"
+  },
+  {
+    "batch": 32,
+    "date": "2026-07-04T16:43:00+08:00",
+    "subject": "feat: 开发单链接统计详情与管理端查询",
+    "author": "qaqzwsx123",
+    "commit": "268b73a0704013d2603ad92ea27a08311df31ecf"
+  },
+  {
+    "batch": 33,
+    "date": "2026-07-05T10:56:00+08:00",
+    "subject": "fix: 完善访问明细并修复统计数据",
+    "author": "qaqzwsx123",
+    "commit": "d019ffe0b935bc9dd942468c7981002564a023a1"
+  },
+  {
+    "batch": 34,
+    "date": "2026-07-06T12:09:00+08:00",
+    "subject": "feat: 增加访问记录分页与今日统计分表",
+    "author": "qaqzwsx123",
+    "commit": "9c35a5caf2c31c47a974aa3b4e16f29b923ff6d9"
+  },
+  {
+    "batch": 35,
+    "date": "2026-07-07T14:22:00+08:00",
+    "subject": "feat: 完成汇总统计、今日统计与分页排序",
+    "author": "qaqzwsx123",
+    "commit": "a9d909da111a6ea352989d37b339b97ad0faa71d"
+  },
+  {
+    "batch": 36,
+    "date": "2026-07-08T16:35:00+08:00",
+    "subject": "feat: 开发单链接概览与分组访问统计",
+    "author": "qaqzwsx123",
+    "commit": "3a7fa45b7c34057f04b62aca7da382af54ff363d"
+  },
+  {
+    "batch": 37,
+    "date": "2026-07-10T10:48:00+08:00",
+    "subject": "feat: 初始化Vue控制台与数据库脚本",
+    "author": "qaqzwsx123",
+    "commit": "106313317db5d10669c21cc6ef4bdb83a9d333ce"
+  },
+  {
+    "batch": 38,
+    "date": "2026-07-11T12:01:00+08:00",
+    "subject": "feat: 完成前端监控页面与链接表格排序",
+    "author": "qaqzwsx123",
+    "commit": "84fb343a65f871f2f988b4cc325dcc6a48ff3d06"
+  },
+  {
+    "batch": 39,
+    "date": "2026-07-12T14:14:00+08:00",
+    "subject": "feat: 增加批量创建并统一域名配置",
+    "author": "qaqzwsx123",
+    "commit": "bdc58ec532ffb3a52913e5a3110b5f46b200089f"
+  },
+  {
+    "batch": 40,
+    "date": "2026-07-13T16:27:00+08:00",
+    "subject": "fix: 修复跳转空指针、统计排序与浏览器日期",
+    "author": "qaqzwsx123",
+    "commit": "0806d32ca233be298af2d22412f0c6a6db75362e"
+  },
+  {
+    "batch": 41,
+    "date": "2026-07-14T10:40:00+08:00",
+    "subject": "fix: 修复链接编辑后跳转与访客类型展示",
+    "author": "qaqzwsx123",
+    "commit": "74173efac237d9f18d009f7d86a46772831f51cc"
+  },
+  {
+    "batch": 42,
+    "date": "2026-07-15T12:53:00+08:00",
+    "subject": "feat: 完成前端批量创建与参数命名对齐",
+    "author": "qaqzwsx123",
+    "commit": "131e5998f9f2e2f6f31d2d83bfc74b72636da9b0"
+  },
+  {
+    "batch": 43,
+    "date": "2026-07-16T14:06:00+08:00",
+    "subject": "fix: 完善控制台样式与登录失效跳转",
+    "author": "qaqzwsx123",
+    "commit": "c165999fcc785e7065a470acd1ee5ae85adc04dd"
+  },
+  {
+    "batch": 44,
+    "date": "2026-07-17T16:19:00+08:00",
+    "subject": "feat: 支持链接跨组移动与目标域名白名单",
+    "author": "qaqzwsx123",
+    "commit": "48566b5d14bbe32f0097ba6bf9d74c56369e0085"
+  },
+  {
+    "batch": 45,
+    "date": "2026-07-18T10:32:00+08:00",
+    "subject": "fix: 完善页面刷新及重复登录Token处理",
+    "author": "qaqzwsx123",
+    "commit": "9e334d6e3442b2fd2394523b18b7ae8631e444b2"
+  },
+  {
+    "batch": 46,
+    "date": "2026-07-19T12:45:00+08:00",
+    "subject": "perf: 限制分组数量并完善分页错误提示",
+    "author": "qaqzwsx123",
+    "commit": "09cd2ac412c4baa385ebb942ddf12268afaa5997"
+  },
+  {
+    "batch": 47,
+    "date": "2026-07-20T14:58:00+08:00",
+    "subject": "fix: 修复布隆过滤判断并增加用户请求风控",
+    "author": "qaqzwsx123",
+    "commit": "8ad4c836f8ff1823c946cc2f46a6364be3f64418"
+  },
+  {
+    "batch": 48,
+    "date": "2026-07-21T16:11:00+08:00",
+    "subject": "feat: 增加短链接创建限流与用户异常提示",
+    "author": "qaqzwsx123",
+    "commit": "878960702f320061b7beca553c2de9b5171c7c85"
+  },
+  {
+    "batch": 49,
+    "date": "2026-07-22T10:24:00+08:00",
+    "subject": "refactor: 调整统计入库流程并实现消费幂等",
+    "author": "qaqzwsx123",
+    "commit": "e5caf78fdd730815d347be9923daf9eb067439e5"
+  },
+  {
+    "batch": 50,
+    "date": "2026-07-23T12:37:00+08:00",
+    "subject": "feat: 完善延迟统计消费与缓存键规范",
+    "author": "qaqzwsx123",
+    "commit": "9a6286140b88666c295ffb5fe05caed85e6ca870"
+  },
+  {
+    "batch": 51,
+    "date": "2026-07-25T14:50:00+08:00",
+    "subject": "fix: 修正统计表唯一索引并初始化Stream消费组",
+    "author": "qaqzwsx123",
+    "commit": "811c087173586873d0a3ea7eb86c390a18b441d6"
+  },
+  {
+    "batch": 52,
+    "date": "2026-07-26T16:03:00+08:00",
+    "subject": "fix: 处理并发短码冲突并增加创建事务",
+    "author": "qaqzwsx123",
+    "commit": "6c5a854756ea7b3e09d815510da914b18fc85519"
+  },
+  {
+    "batch": 53,
+    "date": "2026-07-27T10:16:00+08:00",
+    "subject": "refactor: 接入微服务调用并修复回收站恢复",
+    "author": "qaqzwsx123",
+    "commit": "cacfd15fff2afcd686659a84f97a78267ff4bfcc"
+  },
+  {
+    "batch": 54,
+    "date": "2026-07-28T12:29:00+08:00",
+    "subject": "feat: 接入网关鉴权并完善登录续期",
+    "author": "qaqzwsx123",
+    "commit": "6798bf8bfbeaf5bd1e1b8a7066770aa27e49b4ff"
+  },
+  {
+    "batch": 55,
+    "date": "2026-07-29T14:42:00+08:00",
+    "subject": "feat: 增加聚合部署服务",
+    "author": "qaqzwsx123",
+    "commit": "78c8f572f4d477fa3e33ad5c6363009308821146"
+  },
+  {
+    "batch": 56,
+    "date": "2026-07-30T16:55:00+08:00",
+    "subject": "fix: 修复前端重复API前缀与本地路由",
+    "author": "qaqzwsx123",
+    "commit": "3f7f162004573858790403963d8ada795860d07e"
+  },
+  {
+    "batch": 57,
+    "date": "2026-07-31T10:08:00+08:00",
+    "subject": "fix: 修复监控比例、省份排行与分组滚动展示",
+    "author": "qaqzwsx123",
+    "commit": "810fc29343d4e3e105a92f800c6391e7735eb605"
+  },
+  {
+    "batch": 58,
+    "date": "2026-08-01T12:21:00+08:00",
+    "subject": "fix: 完善初始化数据并修复聚合服务远程部署",
+    "author": "qaqzwsx123",
+    "commit": "48e27759bc6c3d910c44a1cbb3db7ae8d063b97a"
+  },
+  {
+    "batch": 59,
+    "date": "2026-08-02T14:34:00+08:00",
+    "subject": "fix: 分离用户名与短链接布隆过滤器名称",
+    "author": "qaqzwsx123",
+    "commit": "528e60e19612ba2021b52fe49c4cd21b864187cc"
+  },
+  {
+    "batch": 60,
+    "date": "2026-08-03T16:47:00+08:00",
+    "subject": "fix: 修正分组排序接口并完善布隆过滤器容错",
+    "author": "qaqzwsx123",
+    "commit": "ef01c0ec4590c420e8ac3abc3c780af4a9be8834"
+  },
+  {
+    "batch": 61,
+    "date": "2026-08-04T10:00:00+08:00",
+    "subject": "docs: 补充分布式锁性能对比与实现说明",
+    "author": "qaqzwsx123",
+    "commit": "b4a7681fc3f19a58dcedc5837ee370d5239c3ae2"
+  },
+  {
+    "batch": 62,
+    "date": "2026-08-05T12:13:00+08:00",
+    "subject": "fix: 修复限流流程、注册锁冲突与用户修改校验",
+    "author": "qaqzwsx123",
+    "commit": "75d357fa3e238f65e53dca063b12bb7af941f16d"
+  },
+  {
+    "batch": 63,
+    "date": "2026-08-06T14:26:00+08:00",
+    "subject": "fix: 调整统计读写锁并修复幂等及队列空读异常",
+    "author": "qaqzwsx123",
+    "commit": "624e2462bfd35acf7e4883273c7470f396f020db"
+  },
+  {
+    "batch": 64,
+    "date": "2026-08-07T16:39:00+08:00",
+    "subject": "refactor: 清理停用的延迟队列初始化逻辑",
+    "author": "qaqzwsx123",
+    "commit": "0c5ea59c99da0023fe1b74f72e445453e335d907"
+  },
+  {
+    "batch": 65,
+    "date": "2026-08-09T10:52:00+08:00",
+    "subject": "fix: 完善监控页面与登录失效处理",
+    "author": "qaqzwsx123",
+    "commit": "d5dca0ccd010c57851c2f9edae07d56890441c5d"
+  },
+  {
+    "batch": 66,
+    "date": "2026-08-10T12:05:00+08:00",
+    "subject": "refactor: 调整今日统计分表与分组统计逻辑",
+    "author": "qaqzwsx123",
+    "commit": "ab357b758413e3e90e3e3070a1a46e5efab30b5f"
+  },
+  {
+    "batch": 67,
+    "date": "2026-08-11T14:18:00+08:00",
+    "subject": "fix: 修复修改原始链接后缓存未更新",
+    "author": "qaqzwsx123",
+    "commit": "9fdb866e15e4d381a187fe376336fbf2c79dd0e6"
+  },
+  {
+    "batch": 68,
+    "date": "2026-08-12T16:31:00+08:00",
+    "subject": "fix: 修复分组标识异常与跨组短链接重复",
+    "author": "qaqzwsx123",
+    "commit": "9358f365b811e36e28625bad2481468a625a1586"
+  },
+  {
+    "batch": 69,
+    "date": "2026-08-13T10:44:00+08:00",
+    "subject": "perf: 更新工具依赖并优化空缓存查询",
+    "author": "qaqzwsx123",
+    "commit": "aa7cbe885d803d471a9ec4c89dbbe102b0a4b152"
+  },
+  {
+    "batch": 70,
+    "date": "2026-08-14T12:57:00+08:00",
+    "subject": "fix: 修复风控无限刷新与分片逻辑表名",
+    "author": "qaqzwsx123",
+    "commit": "cc8e86cdedc772c8398238c50ef42f36d359fe6b"
+  },
+  {
+    "batch": 71,
+    "date": "2026-08-15T14:10:00+08:00",
+    "subject": "fix: 修复短链接监控数据横向越权",
+    "author": "qaqzwsx123",
+    "commit": "b66a0a4426be6aad4a229b29a6eb43c8567de57a"
+  },
+  {
+    "batch": 72,
+    "date": "2026-08-16T16:23:00+08:00",
+    "subject": "perf: 完善跨日期统计与消息幂等命名",
+    "author": "qaqzwsx123",
+    "commit": "b71cffdcb7d7b24ea122a126b5c2bd045e897b56"
+  },
+  {
+    "batch": 73,
+    "date": "2026-08-17T10:36:00+08:00",
+    "subject": "fix: 修复分组唯一索引与布隆过滤重复处理",
+    "author": "qaqzwsx123",
+    "commit": "ad449069cc4aa6180a2f234b8383a231a1a231de"
+  },
+  {
+    "batch": 74,
+    "date": "2026-08-18T12:49:00+08:00",
+    "subject": "perf: 优化统计消息队列消费逻辑",
+    "author": "qaqzwsx123",
+    "commit": "fcbc26df84b787678e1de285a4da13b0a2824b59"
+  },
+  {
+    "batch": 75,
+    "date": "2026-08-19T14:02:00+08:00",
+    "subject": "fix: 修复更新短链接后网站图标未刷新",
+    "author": "qaqzwsx123",
+    "commit": "de6381f0e4088398f1eff6be2b9799317d70eb51"
+  },
+  {
+    "batch": 76,
+    "date": "2026-08-20T16:15:00+08:00",
+    "subject": "feat: 增加演示模式数据保护与错误提示",
+    "author": "qaqzwsx123",
+    "commit": "e784b2db91f2cc95dfa9465df2c842f2c4d1593b"
+  },
+  {
+    "batch": 77,
+    "date": "2026-08-21T10:28:00+08:00",
+    "subject": "feat: 接入短链接服务Metrics指标上报",
+    "author": "qaqzwsx123",
+    "commit": "08496e7b743629bf48766189ea05c453ca0feee3"
+  },
+  {
+    "batch": 78,
+    "date": "2026-08-22T12:41:00+08:00",
+    "subject": "fix: 适配本地MySQL8并修复统计日期切换空值",
+    "author": "qaqzwsx123",
+    "commit": "f4271e2b980aee597df43911db28c6fb07160fb9"
+  },
+  {
+    "batch": 79,
+    "date": "2026-08-24T14:54:00+08:00",
+    "subject": "docs: 更新项目说明与相关资源链接",
+    "author": "qaqzwsx123",
+    "commit": "5c4e58a4e2276aa2d6fe02fecbbecc82f71cdfc7"
+  },
+  {
+    "batch": 80,
+    "date": "2026-08-25T16:07:00+08:00",
+    "subject": "feat: 接入Sentinel规则并调整服务参数",
+    "author": "qaqzwsx123",
+    "commit": "3b2364cc005093e6e905c02aebe2b5d03129f3c0"
+  },
+  {
+    "batch": 81,
+    "date": "2026-08-26T10:20:00+08:00",
+    "subject": "docs: 补充布隆过滤器配置说明",
+    "author": "qaqzwsx123",
+    "commit": "ef5654886822a40d709615d46bbfbd9b263c3c40"
+  },
+  {
+    "batch": 82,
+    "date": "2026-08-27T12:33:00+08:00",
+    "subject": "docs: 补充缓存与短链接核心流程注释",
+    "author": "qaqzwsx123",
+    "commit": "d88d9f52e6819c02cb734960b2ca712bc1c1767f"
+  },
+  {
+    "batch": 83,
+    "date": "2026-08-28T14:46:00+08:00",
+    "subject": "fix: Redis不可用时增加本地用户请求限流",
+    "author": "qaqzwsx123",
+    "commit": "169402796c045a1127f3ce19abf287b1d5d4da3e"
+  },
+  {
+    "batch": 84,
+    "date": "2026-08-29T16:59:00+08:00",
+    "subject": "fix: 隔离统计消息发送失败对跳转链路的影响",
+    "author": "qaqzwsx123",
+    "commit": "887497624e7d90def5a361ef740588cd7d5c7dc2"
+  },
+  {
+    "batch": 85,
+    "date": "2026-08-30T10:12:00+08:00",
+    "subject": "fix: 增加Redis故障时的受控数据库跳转兜底",
+    "author": "qaqzwsx123",
+    "commit": "f531b93e9d1c3035b3a71428d9e78d6ca551d8c6"
+  }
+]
